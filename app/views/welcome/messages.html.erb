@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.darker {
+    border-color: #ccc;
+    background-color: #ddd;
+}
+
+.container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+}
+
+.time-right {
+    float: right;
+    color: #aaa;
+}
+
+.time-left {
+    float: left;
+    color: #999;
+}
+</style>
+</head>
+<body>
+
+<h2>Chat Messages</h2>
+
+<div id="chat_body">
+<%@msgs.each do |msgs| %>
+
+ <% if msgs.file.create_by.to_i==current_user.id.to_i %>
+
+<div class="container darker">
+  <%=msgs.create.to_s %>:
+  <p><%=msgs.file.body.to_s %></p>
+</div>
+
+<% else %>
+<div class="container">
+<%=msgs.create.to_s %>:
+  <p><%=msgs.file.body.to_s %></p>
+
+</div>
+
+<% end %>
+
+<% end %>
+
+</div>
+
+<textarea rows=2" cols="20" id="msg_val" name="msg_val">
+</textarea><a id="send_link" href="#" onclick="return send_msg('<%=params[:send_to].to_i %>')">send</a>
+
+</body>
+<br>
+<br>
+<a href="/home">BackToHome</a>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#send_link').hide();
+  $('#msg_val').bind('input propertychange', function() {
+
+if(this.value.length==0){
+ $('#send_link').hide();
+}
+else
+{
+  $('#send_link').show();
+}
+
+})
+})  
+  var refreshIntervalID = setInterval(showIncmngMessages, 20000); 
+  function showIncmngMessages()
+  {
+    $.ajax({
+              url: "/getrealtime_msgs",
+              type: "GET",
+              dataType: "json",
+              data: {send: '<%=params[:send_to].to_i %>'},
+
+              success: function (data, textStatus, jqXHR) {
+
+                var data_div=''
+                var div_dark='';
+
+                $.each(data,function(key,value){
+                
+
+                for (i = 0; i < value.length; i++) {
+                  //iterate
+                     if(value[i].file.create_by == "<%=current_user.id.to_i %>")
+                     {
+
+                      div_dark='<div class="container darker">'+
+                                value[i].create+':'+
+                              '<p>'+value[i].file.body+'</p>'+
+                              '</div>'
+
+                     }
+
+                     else
+                     {
+                       div_dark='<div class="container">'+
+                                value[i].create+':'+
+                              '<p>'+value[i].file.body+'</p>'+
+                              '</div>'
+                     }
+
+                    data_div=data_div+div_dark    
+
+                }
+
+              $('#chat_body').html(data_div);
+
+              })
+
+                
+
+              }
+
+            })
+  }
+  function send_msg(send)
+  {
+    msg=$('#msg_val').val();
+    var formData = new FormData();
+    formData.append('send_to', send);
+    formData.append('message', msg);
+
+    $.ajax({
+              url: "/create_msg",
+              contentType: false,
+              processData: false,
+              data: formData,
+              type: 'Post',
+                success: function(data, textStatus, jqXHR){
+                 
+                 //show all updated messages
+                 showIncmngMessages();
+                  
+                }
+            });
+
+  }
+</script>
+</html>

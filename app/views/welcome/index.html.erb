@@ -1,0 +1,111 @@
+
+<div class="container" >
+   <form>
+      <input type="text" id="search_user" placeholder="Search people" name="search_user">
+    </form>
+    <div class="searchList" id="PatientList" style="position:absolute;z-index:10;"></div>
+    <br>
+<h1>Welcome</h1>
+<p>Tweets</p>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-8">
+      <%= link_to 'New post', new_post_path %>
+      <div class="row" >
+      <ul>
+      <% @posts.each do |post| %>
+
+      <h3><%= post.user.name %> </h3>
+      <h4><%= post.title %> </h4>
+      <div class="module" >
+      <%= image_tag post.image.url , style: 'height:auto;width:80%;' %>
+      </div>
+      <p><%= post.text %></p>
+      <p> <br><%= link_to 'Show', post %> 
+      </tr>
+      <% end %>
+      </ul>
+    </div>
+    <h1>Friends Tweets</h1>
+      <div class="col-md-8">
+      <div class="row" >
+      <ul>
+      <% @friend_tweets.each do |post| %>
+
+      <h3><%= post.file.user.name %> </h3>
+      <h4><%= post.file.title %> </h4>
+      <div class="module" >
+      <%= image_tag post.file.image.url , style: 'height:auto;width:80%;' %>
+      </div>
+      <p><%= post.file.text %></p>
+      <% @retweet=TWITTERLOGIC.checkOnceTweeted(current_user,post.file.id.to_i)
+      if @retweet.blank? %>
+      <p> <br><a href="/re_tweet?post_id=<%=post.file.id.to_i %>">Retweet</a>
+        <% end %>
+      </tr>
+      <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+     $("#search_user").keyup(function(){
+        var query = $(this).val();
+        if(query != '' && query.length > 2 ){
+            $.ajax({
+                url : "/search_user",
+                type: "GET",
+                dataType: "json",
+        data: {name:query} ,
+                success: function(data, textStatus, jqXHR){
+
+
+            $.each(data,function(key,value){
+
+               var div_data='<ul class="search_list_pat" >';
+              document.getElementById("PatientList").style.display = "block";
+              if(value.length === 0){
+                div_data = div_data + '<a href="#">No record found</a>';
+              }else{
+                for (i = 0; i < value.length; i++) {
+                  id=value[i].file.id
+                  div_data= div_data + '<li id='+value[i].file.id+'>' + value[i].file.name + ' ' + 
+                  '<a href="#" onclick="return followUnfollow('+value[i].file.id+');">'+value[i].follow+'</a>'+' '+'<a href="/messages?send_to='+id+'">Send Message</a>'+'</li>';
+
+                  }
+                 }
+              div_data = div_data + '</ul>';
+
+              $('#PatientList').fadeIn();
+              $('#PatientList').html(div_data);
+            });
+                }
+            });
+        }
+    else{
+        document.getElementById("PatientList").style.display = "none";
+    }
+    });
+  });
+
+  function followUnfollow(user_id)
+  {
+     $.ajax({
+                url : "/follow_or_unfollow",
+                type: "GET",
+                dataType: "json",
+              data: {user_id:user_id} ,
+                success: function(data, textStatus, jqXHR){
+                 
+                 //if taks done do page refresh
+                 window.location.reload();
+                  
+                }
+            });
+  }
+
+</script>

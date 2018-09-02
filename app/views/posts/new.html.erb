@@ -1,0 +1,38 @@
+
+<div class="container">
+  <%= form_for :post,  url:posts_path, html: { class: 'form-group' } do |f|  %>
+    <% if @post.errors.any? %> @post.errors.any?
+      <h3><%= pluralize(@post.errors.count,"error")%>
+      this post from being saved : </h3>
+      <ul>
+      <% @post.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+         <% end %>
+      </ul>
+    <% end %>
+    <div class="row">
+      <div class="col-25">
+        <%= f.label :title %><br>
+      </div>
+      <div class="col-75">
+        <%= f.text_field :title, html: { class: 'form-control' }  %>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-25">
+        <%= f.label :text %><br>
+      </div>
+      <div class="col-75">
+        <%= f.text_area :text,  html: { class: 'form-control' } %>
+      </div>
+    </div>
+
+      <%= f.label :image %>
+      <%= f.file_field :image %>
+    
+      <div class="row">
+        <%= f.submit %>
+      </div>
+    <% end %>
+</div>
