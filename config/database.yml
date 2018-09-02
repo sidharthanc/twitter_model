@@ -13,7 +13,7 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: twitter_app
+  database: twitter_app_clone
   pool: 5
   username: root
   password: root   ### password you have specified within psql
@@ -42,7 +42,7 @@ development:
 production:
   adapter: postgresql
   encoding: unicode
-  database: twitter_app
+  database: twitter_app_clone
   pool: 5
   username: root
   password: root   ### password you have specified within psql
