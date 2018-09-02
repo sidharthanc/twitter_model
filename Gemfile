@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-
+ruby '2.3.0'
 gem 'prawn','~> 1.0.0.rc2'
 gem 'googlecharts', '~> 1.6', '>= 1.6.12'
 gem 'gchartrb', '~> 0.8'
