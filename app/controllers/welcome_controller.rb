@@ -47,8 +47,7 @@ class WelcomeController < ApplicationController
    @create_msg=TWITTERLOGIC.createMsg(current_user,params[:message].to_s,params[:send_to].to_i)
    @msgs=TWITTERLOGIC.getMessages(current_user,params[:send_to].to_i)
     respond_to do |format|
-      format.html
-      format.json { render :json => @msgs }
+    format.js { render nothing: true } 
     end
   end
 end
